@@ -1,5 +1,5 @@
-use tracing::{debug, error, info, warn};
-use twitter_v2::{data::StreamRule, requests::StreamRuleBuilder, Authorization, TwitterApi};
+use rust_lib::re_export::twitter_v2::{Authorization, requests::StreamRuleBuilder, TwitterApi, self, data::StreamRule};
+use tracing::{error, info, warn};
 
 pub struct Rule {
     pub tag: String,

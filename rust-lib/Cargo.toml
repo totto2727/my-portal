@@ -11,3 +11,4 @@ time = "0.3.17"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 twitter-v2 = { git = "https://github.com/totto2727/twitter-v2-rs", rev ="d717a04f3fce245f62a7936308e7402d8e0c5c2a", features = ["rustls-tls"] }
+redis = { version = "0.22.1", features = ["tokio-comp"] }

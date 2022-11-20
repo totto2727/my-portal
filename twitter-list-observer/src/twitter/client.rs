@@ -1,6 +1,6 @@
 use std::env::VarError;
 
-use twitter_v2::{TwitterApi, authorization::BearerToken};
+use rust_lib::re_export::twitter_v2::{authorization::BearerToken, TwitterApi};
 
 use crate::env::env_twitter_bearer;
 

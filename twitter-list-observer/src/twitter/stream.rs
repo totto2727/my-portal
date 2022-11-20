@@ -1,5 +1,5 @@
 use futures::Stream;
-use rust_lib::portal::Message;
+use rust_lib::{portal::Message, re_export::twitter_v2};
 use tracing::warn;
 use twitter_v2::{
     meta::SentMeta,
@@ -28,7 +28,9 @@ pub async fn query_stream<T: Authorization>(
     };
 }
 
-pub fn convert_message<M>(item: Result<ApiPayload<Tweet, M>, twitter_v2::Error>)->Result<Message, Box<dyn std::error::Error>> {
+pub fn convert_message<M>(
+    item: Result<ApiPayload<Tweet, M>, twitter_v2::Error>,
+) -> Result<Message, Box<dyn std::error::Error>> {
     let payload = match item {
         Ok(ok) => ok,
         Err(err) => {
