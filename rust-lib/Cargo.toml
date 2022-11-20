@@ -1,0 +1,13 @@
+[package]
+name = "rust-lib"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+dotenv = "0.15.0"
+time = "0.3.17"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+twitter-v2 = { git = "https://github.com/totto2727/twitter-v2-rs", rev ="d717a04f3fce245f62a7936308e7402d8e0c5c2a", features = ["rustls-tls"] }
