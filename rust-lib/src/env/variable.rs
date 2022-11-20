@@ -1,5 +1,20 @@
 use std::env::VarError;
 
-pub fn env_redis_url() -> Result<String, VarError> {
+type Result<T> = std::result::Result<T, VarError>;
+
+pub fn env_redis_url() -> Result<String> {
     std::env::var("REDIS_URL")
+}
+
+pub fn env_rabbitmq_user() -> Result<String> {
+    std::env::var("RABBITMQ_USER")
+}
+pub fn env_rabbitmq_pass() -> Result<String> {
+    std::env::var("RABBITMQ_PASS")
+}
+pub fn env_rabbitmq_domain() -> Result<String> {
+    std::env::var("RABBITMQ_DOMAIN")
+}
+pub fn env_rabbitmq_port() -> Result<String> {
+    std::env::var("RABBITMQ_PORT")
 }
