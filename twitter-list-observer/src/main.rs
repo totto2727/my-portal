@@ -4,9 +4,9 @@ mod twitter;
 use std::error::Error;
 
 use futures::prelude::*;
-use rust_lib::{env::load_env, portal::Message};
+use rust_lib::env::load_env;
 use tracing::{error, info, warn};
-use twitter::{get_api_app_ctx, Rule, query_stream};
+use twitter::{convert_message, get_api_app_ctx, query_stream, Rule};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -37,20 +37,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
         futures::pin_mut!(stream);
         while let Some(item) = stream.next().await {
-            let payload = match item {
+            let message = match convert_message(item) {
                 Ok(ok) => ok,
-                Err(err) => {
-                    warn!("fail to get tweet:{:?}", err);
-                    break;
-                }
-            };
-
-            let message = match Message::from_twitter_api_payload(payload){
-                Some(some)=>some,
-                None =>{
-                    warn!("fail to convert message from payload");
-                    break;
-                }
+                Err(_) => break,
             };
 
             if let Ok(serialized) = serde_json::to_string(&message) {

@@ -2,7 +2,10 @@ use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use twitter_v2::{ApiPayload, Tweet};
 
-use crate::portal::author::{Author, TwitterAuther};
+use crate::{
+    custom_error::OptionError,
+    portal::author::{Author, TwitterAuther}, otor,
+};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Message {
@@ -15,14 +18,19 @@ pub struct Message {
 }
 
 impl Message {
-    pub fn from_twitter_api_payload<M>(payload: ApiPayload<Tweet, M>) -> Option<Message> {
-        let tweet = payload.data?;
-        let author = payload.includes?.users?.pop()?;
-        let matching_rules = payload.matching_rules?;
+    pub fn from_twitter_api_payload<M>(
+        payload: ApiPayload<Tweet, M>,
+    ) -> Result<Message, OptionError> {
+        let tweet = otor!(payload.data)?;
 
+        let includes = otor!(payload.includes)?;
+        let users = otor!(includes.users)?;
+        let author = otor!(users.get(0))?.clone();
+
+        let matching_rules = otor!(payload.matching_rules)?;
         let tags: Vec<String> = matching_rules.iter().map(|rule| rule.tag.clone()).collect();
 
-        return Some(Message {
+        return Ok(Message {
             tag: tags,
             id: tweet.id.to_string(),
             author: Author::TwitterAuther(TwitterAuther {
@@ -30,9 +38,8 @@ impl Message {
                 name: author.name,
                 user_name: author.username,
             }),
-            created_at: tweet.created_at?,
+            created_at: otor!(tweet.created_at)?,
             message: tweet.text,
         });
     }
 }
-
