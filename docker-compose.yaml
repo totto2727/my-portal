@@ -1,0 +1,14 @@
+services:
+  twitter-list-observer:
+    build:
+      context: .
+      dockerfile: ./twitter-list-observer/Dockerfile
+    env_file:
+      - ./twitter-list-observer/.env
+      - ./twitter-list-observer/.env.production
+    networks:
+      - rabbitmq
+
+networks:
+  rabbitmq:
+    external: true

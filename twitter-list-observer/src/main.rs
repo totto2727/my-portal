@@ -1,19 +1,16 @@
 mod env;
 mod twitter;
 
-use std::error::Error;
-
 use futures::prelude::*;
+use rust_lib::env::load_env;
 use rust_lib::rabbitmq::channel;
 use rust_lib::re_export::deadpool_lapin::lapin::options::{
     BasicPublishOptions, QueueDeclareOptions,
 };
 use rust_lib::re_export::deadpool_lapin::lapin::types::FieldTable;
 use rust_lib::re_export::deadpool_lapin::lapin::BasicProperties;
-use rust_lib::re_export::redis::JsonAsyncCommands;
-use rust_lib::re_export::{serde, serde_json};
-use rust_lib::redis::client::get_redis_client;
-use rust_lib::{env::load_env, portal::Message};
+use rust_lib::re_export::serde_json;
+use std::error::Error;
 use tracing::{error, info};
 use twitter::{convert_message, get_api_app_ctx, query_stream, Rule};
 
@@ -25,9 +22,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let twitter = get_api_app_ctx()?;
 
-    let rules = [
-        Rule::new("La priere", "from:Lapriere_info"),
-    ];
+    let rules = [Rule::new("La priere", "from:Lapriere_info")];
 
     Rule::query_initialize_rules(&twitter, &rules).await?;
 
@@ -66,7 +61,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     "",
                     "portal_message",
                     BasicPublishOptions::default(),
-                    Vec::from(json),
+                    &Vec::from(json),
                     BasicProperties::default(),
                 )
                 .await?;

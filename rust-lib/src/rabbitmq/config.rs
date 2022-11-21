@@ -19,7 +19,6 @@ pub fn config() -> Result<Config, VarError> {
         ))),
         pool: Some(PoolConfig {
             max_size: 100,
-            runtime: deadpool::Runtime::Tokio1,
             timeouts: Timeouts::default(),
         }),
         ..Default::default()
@@ -27,7 +26,7 @@ pub fn config() -> Result<Config, VarError> {
 }
 
 pub async fn channel() -> Result<Channel, Box<dyn Error>> {
-    let pool = config()?.create_pool();
+    let pool = config()?.create_pool(Some(deadpool::Runtime::Tokio1))?;
     let connection = pool.get().await?;
     Ok(connection.create_channel().await?)
 }
