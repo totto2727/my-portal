@@ -1,5 +1,3 @@
-use std::path::PathBuf;
-
 use super::environment::Environment;
 
 /// 環境に応じて.env.*を読み込む。
@@ -9,11 +7,11 @@ use super::environment::Environment;
 /// - Development => `.env.development`
 /// - Test => `.env.test`
 ///
-pub fn load_env() -> Result<PathBuf, dotenv::Error> {
-   dotenv::dotenv()?;
+pub fn load_env() -> Result<(), dotenv::Error> {
     match Environment::get_environment() {
+        Environment::PRODUCTION => return Ok(()),
         Environment::TEST => dotenv::from_filename(".env.test"),
         Environment::DEVELOPMENT => dotenv::from_filename(".env.development"),
-        Environment::PRODUCTION => dotenv::from_filename(".env.production"),
-    }
+    }?;
+   dotenv::dotenv().map(|_|())
 }
