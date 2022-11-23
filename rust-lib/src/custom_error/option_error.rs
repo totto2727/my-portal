@@ -1,25 +1,25 @@
 use std::{error, fmt};
 
 #[derive(Debug, Clone)]
-pub struct OptionError {
+pub struct OptionalError {
     field: String,
 }
 
-impl OptionError {
-    pub fn new<S: Into<String>>(field: S) -> OptionError {
-        OptionError {
+impl OptionalError {
+    pub fn new<S: Into<String>>(field: S) -> OptionalError {
+        OptionalError {
             field: field.into(),
         }
     }
 }
 
-impl fmt::Display for OptionError {
+impl fmt::Display for OptionalError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "None:{}", self.field)
     }
 }
 
-impl error::Error for OptionError {
+impl error::Error for OptionalError {
     fn source(&self) -> Option<&(dyn error::Error + 'static)> {
         None
     }
@@ -28,6 +28,6 @@ impl error::Error for OptionError {
 #[macro_export]
 macro_rules! otor {
     ($x:expr) => {
-        $x.ok_or(OptionError::new(String::from("$x")))
+        $x.ok_or(OptionalError::new(String::from("$x")))
     };
 }

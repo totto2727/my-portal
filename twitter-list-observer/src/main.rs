@@ -1,18 +1,16 @@
 mod env;
+mod queue;
 mod twitter;
 
-use futures::prelude::*;
-use rust_lib::env::load_env;
-use rust_lib::rabbitmq::channel;
-use rust_lib::re_export::deadpool_lapin::lapin::options::{
-    BasicPublishOptions, QueueDeclareOptions,
-};
-use rust_lib::re_export::deadpool_lapin::lapin::types::FieldTable;
-use rust_lib::re_export::deadpool_lapin::lapin::BasicProperties;
-use rust_lib::re_export::serde_json;
+use crate::queue::message::Convert;
+use futures::{pin_mut, prelude::*};
+use rust_lib::queue::get_pool;
+use rust_lib::{env::load_env, queue::Queue};
 use std::error::Error;
-use tracing::{error, info};
-use twitter::{convert_message, get_api_app_ctx, query_stream, Rule};
+use tokio::time::{sleep, Duration};
+use tracing::{error, info, warn};
+use tracing_subscriber;
+use twitter::{get_api_app_ctx, query_stream, Rule};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -22,18 +20,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let twitter = get_api_app_ctx()?;
 
-    let rules = [Rule::new("La priere", "from:Lapriere_info")];
+    // let rules = [Rule::new("La priere", "from:Lapriere_info")];
+    let rules = [Rule::new("cat", "猫")];
 
     Rule::query_initialize_rules(&twitter, &rules).await?;
 
-    let channel = channel().await?;
+    let queue_connection_pool = get_pool()?;
 
-    channel
-        .queue_declare(
-            "portal_message",
-            QueueDeclareOptions::default(),
-            FieldTable::default(),
-        )
+    Queue::PortalMessage
+        .declare(&Queue::create_channel(&queue_connection_pool).await?)
         .await?;
 
     loop {
@@ -41,35 +36,50 @@ async fn main() -> Result<(), Box<dyn Error>> {
             Ok(ok) => ok,
             Err(err) => {
                 error!("fail to query stream:{:?}", err);
-                tokio::time::sleep(tokio::time::Duration::from_secs(960)).await;
+                sleep(Duration::from_secs(960)).await;
                 continue;
             }
         };
 
         info!("stream start");
 
-        futures::pin_mut!(stream);
+        pin_mut!(stream);
         while let Some(item) = stream.next().await {
-            let message = match convert_message(item) {
+            let payload = match item {
                 Ok(ok) => ok,
-                Err(_) => break,
+                Err(err) => {
+                    error!("fail to get tweet:{:?}", err);
+                    break;
+                }
             };
 
-            let json = serde_json::to_string(&message)?;
-            channel
-                .basic_publish(
-                    "",
-                    "portal_message",
-                    BasicPublishOptions::default(),
-                    &Vec::from(json),
-                    BasicProperties::default(),
-                )
-                .await?;
-            info!("{:?}", message);
+            let message = match payload.convert() {
+                Ok(ok) => ok,
+                Err(err) => {
+                    warn!("fail to convert tweet to message:{:?}", err);
+                    continue;
+                }
+            };
+
+            let channel = match Queue::create_channel(&queue_connection_pool).await {
+                Ok(ok) => ok,
+                Err(err) => {
+                    warn!("fail to create rabbitmq channel:{:?}", err);
+                    continue;
+                }
+            };
+
+            match Queue::PortalMessage.publish(&channel, &message).await {
+                Ok(_) => info!("{:?}", message),
+                Err(err) => {
+                    warn!("fail to publish to queue:{:?}", err);
+                    continue;
+                }
+            };
         }
 
         info!("stream stop");
-        tokio::time::sleep(tokio::time::Duration::from_secs(960)).await;
+        sleep(Duration::from_secs(960)).await;
         info!("stream restarting");
     }
 }

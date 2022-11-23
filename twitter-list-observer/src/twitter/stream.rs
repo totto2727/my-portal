@@ -1,6 +1,7 @@
 use futures::Stream;
-use rust_lib::{portal::Message, re_export::twitter_v2};
+use rust_lib::portal::Message;
 use tracing::warn;
+use twitter_v2::Error;
 use twitter_v2::{
     meta::SentMeta,
     query::{TweetExpansion, TweetField},
@@ -9,10 +10,7 @@ use twitter_v2::{
 
 pub async fn query_stream<T: Authorization>(
     client: &TwitterApi<T>,
-) -> Result<
-    impl Stream<Item = Result<ApiPayload<Tweet, SentMeta>, twitter_v2::Error>>,
-    twitter_v2::Error,
-> {
+) -> Result<impl Stream<Item = Result<ApiPayload<Tweet, SentMeta>, twitter_v2::Error>>, Error> {
     match client
         .get_tweets_search_stream()
         .tweet_fields([TweetField::AuthorId, TweetField::CreatedAt])
@@ -28,22 +26,22 @@ pub async fn query_stream<T: Authorization>(
     };
 }
 
-pub fn convert_message<M>(
-    item: Result<ApiPayload<Tweet, M>, twitter_v2::Error>,
-) -> Result<Message, Box<dyn std::error::Error>> {
-    let payload = match item {
-        Ok(ok) => ok,
-        Err(err) => {
-            warn!("fail to get tweet:{:?}", err);
-            return Err(err.into());
-        }
-    };
-
-    match Message::from_twitter_api_payload(payload) {
-        Ok(message) => return Ok(message),
-        Err(err) => {
-            warn!("fail to convert message from payload:{:?}", err);
-            return Err(err.into());
-        }
-    };
-}
+// pub fn convert_message<M>(
+//     item: Result<ApiPayload<Tweet, M>, Error>,
+// ) -> Result<Message, Box<dyn std::error::Error>> {
+//     let payload = match item {
+//         Ok(ok) => ok,
+//         Err(err) => {
+//             warn!("fail to get tweet:{:?}", err);
+//             return Err(err.into());
+//         }
+//     };
+//
+//     match Message::from_twitter_api_payload(payload) {
+//         Ok(message) => return Ok(message),
+//         Err(err) => {
+//             warn!("fail to convert message from payload:{:?}", err);
+//             return Err(err.into());
+//         }
+//     };
+// }

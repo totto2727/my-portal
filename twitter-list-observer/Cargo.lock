@@ -307,20 +307,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "combine"
-version = "4.6.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "35ed6e9d84f0b51a7f52daf1c7d71dd136fd7a3f41a8462b8cdb8c78d920fad4"
-dependencies = [
- "bytes",
- "futures-core",
- "memchr",
- "pin-project-lite",
- "tokio",
- "tokio-util",
-]
-
-[[package]]
 name = "concurrent-queue"
 version = "1.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1358,28 +1344,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "redis"
-version = "0.22.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "513b3649f1a111c17954296e4a3b9eecb108b766c803e2b99f179ebe27005985"
-dependencies = [
- "async-trait",
- "bytes",
- "combine",
- "futures-util",
- "itoa",
- "percent-encoding",
- "pin-project-lite",
- "ryu",
- "serde",
- "serde_json",
- "sha1_smol",
- "tokio",
- "tokio-util",
- "url",
-]
-
-[[package]]
 name = "redox_syscall"
 version = "0.2.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1456,12 +1420,14 @@ dependencies = [
  "deadpool",
  "deadpool-lapin",
  "dotenv",
+ "futures",
  "lapin",
- "redis",
  "serde",
  "serde_json",
  "time",
- "twitter-v2",
+ "tokio",
+ "tokio-serde",
+ "tokio-stream",
 ]
 
 [[package]]
@@ -1651,12 +1617,6 @@ dependencies = [
  "cpufeatures",
  "digest 0.10.6",
 ]
-
-[[package]]
-name = "sha1_smol"
-version = "1.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ae1a47186c03a32177042e55dbc5fd5aee900b8e0069a8d70fba96a9375cd012"
 
 [[package]]
 name = "sha2"
@@ -2031,13 +1991,20 @@ checksum = "59547bce71d9c38b83d9c0e92b6066c4253371f15005def0c30d9657f50c7642"
 name = "twitter-list-observer"
 version = "0.1.0"
 dependencies = [
+ "deadpool",
+ "deadpool-lapin",
  "futures",
+ "lapin",
  "rust-lib",
+ "serde",
+ "serde_json",
+ "time",
  "tokio",
  "tokio-serde",
  "tokio-stream",
  "tracing",
  "tracing-subscriber",
+ "twitter-v2",
 ]
 
 [[package]]

@@ -11,5 +11,3 @@ pub struct TwitterAuther {
 pub enum Author {
     TwitterAuther(TwitterAuther),
 }
-
-

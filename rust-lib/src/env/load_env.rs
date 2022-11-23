@@ -13,5 +13,5 @@ pub fn load_env() -> Result<(), dotenv::Error> {
         Environment::TEST => dotenv::from_filename(".env.test"),
         Environment::DEVELOPMENT => dotenv::from_filename(".env.development"),
     }?;
-   dotenv::dotenv().map(|_|())
+    dotenv::dotenv().map(|_| ())
 }
