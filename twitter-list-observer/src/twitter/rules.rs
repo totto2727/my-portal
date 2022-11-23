@@ -51,7 +51,7 @@ impl Rule {
     ) -> Result<Option<Vec<StreamRule>>, twitter_v2::Error> {
         info!("initilizing rule");
 
-        Self::query_reset_rules(&client).await?;
+        Self::query_reset_rules(client).await?;
 
         let mut req_update_rules = client.post_tweets_search_stream_rule();
         Self::add_tagged_rules_to_request(&mut req_update_rules, rules);
@@ -73,6 +73,6 @@ impl Rule {
         };
 
         info!("rule has initilized");
-        return Ok(res_update_rule);
+        Ok(res_update_rule)
     }
 }

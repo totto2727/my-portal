@@ -9,7 +9,6 @@ use rust_lib::{env::load_env, queue::Queue};
 use std::error::Error;
 use tokio::time::{sleep, Duration};
 use tracing::{error, info, warn};
-use tracing_subscriber;
 use twitter::{get_api_app_ctx, query_stream, Rule};
 
 #[tokio::main]

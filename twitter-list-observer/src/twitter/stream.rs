@@ -1,6 +1,4 @@
 use futures::Stream;
-use rust_lib::portal::Message;
-use tracing::warn;
 use twitter_v2::Error;
 use twitter_v2::{
     meta::SentMeta,
@@ -18,30 +16,10 @@ pub async fn query_stream<T: Authorization>(
         .stream()
         .await
     {
-        Ok(suc) => return Ok(suc),
+        Ok(suc) => Ok(suc),
         Err(err) => {
             println!("fail to get stream");
-            return Err(err);
+            Err(err)
         }
-    };
+    }
 }
-
-// pub fn convert_message<M>(
-//     item: Result<ApiPayload<Tweet, M>, Error>,
-// ) -> Result<Message, Box<dyn std::error::Error>> {
-//     let payload = match item {
-//         Ok(ok) => ok,
-//         Err(err) => {
-//             warn!("fail to get tweet:{:?}", err);
-//             return Err(err.into());
-//         }
-//     };
-//
-//     match Message::from_twitter_api_payload(payload) {
-//         Ok(message) => return Ok(message),
-//         Err(err) => {
-//             warn!("fail to convert message from payload:{:?}", err);
-//             return Err(err.into());
-//         }
-//     };
-// }

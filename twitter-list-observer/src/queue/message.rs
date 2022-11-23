@@ -20,7 +20,7 @@ impl<M> Convert<Message, OptionalError> for ApiPayload<Tweet, M> {
         let matching_rules = otor!(self.matching_rules)?;
         let tags: Vec<String> = matching_rules.iter().map(|rule| rule.tag.clone()).collect();
 
-        return Ok(Message {
+        Ok(Message {
             tag: tags,
             id: tweet.id.to_string(),
             author: Author::TwitterAuther(TwitterAuther {
@@ -30,6 +30,6 @@ impl<M> Convert<Message, OptionalError> for ApiPayload<Tweet, M> {
             }),
             created_at: otor!(tweet.created_at)?,
             message: tweet.text,
-        });
+        })
     }
 }
