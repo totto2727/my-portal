@@ -1,7 +1,7 @@
 use rust_lib::{
     custom_error::OptionalError,
     otor,
-    portal::{Author, Message, TwitterAuther},
+    portal::{Message, SourcePlatform, User},
 };
 use twitter_v2::{ApiPayload, Tweet};
 
@@ -23,13 +23,14 @@ impl<M> Convert<Message, OptionalError> for ApiPayload<Tweet, M> {
         Ok(Message {
             tag: tags,
             id: tweet.id.to_string(),
-            author: Author::TwitterAuther(TwitterAuther {
-                id: author.id.to_string(),
-                name: author.name,
-                user_name: author.username,
-            }),
             created_at: otor!(tweet.created_at)?,
-            message: tweet.text,
+            text: tweet.text,
+            source_platform: SourcePlatform::Twitter,
+            author: User {
+                id: author.id.to_string(),
+                user_display_name: Some(author.name),
+                user_name: author.username,
+            },
         })
     }
 }

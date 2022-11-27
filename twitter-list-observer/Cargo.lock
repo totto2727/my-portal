@@ -1424,6 +1424,8 @@ dependencies = [
  "lapin",
  "serde",
  "serde_json",
+ "strum",
+ "strum_macros",
  "time",
  "tokio",
  "tokio-serde",
