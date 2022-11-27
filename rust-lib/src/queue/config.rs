@@ -1,7 +1,7 @@
 pub mod portal_messsage;
 
 use lapin::{
-    options::{BasicPublishOptions, QueueDeclareOptions},
+    options::{BasicPublishOptions, QueueDeclareOptions, BasicConsumeOptions},
     types::FieldTable,
     BasicProperties,
 };
@@ -19,4 +19,11 @@ pub struct PublishConfig {
     pub exchange: String,
     pub options: BasicPublishOptions,
     pub properties: BasicProperties,
+}
+
+#[derive(Debug)]
+pub struct ConsumeConfig {
+    pub name: String,
+    pub options: BasicConsumeOptions,
+    pub field_table: FieldTable,
 }

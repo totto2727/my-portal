@@ -1,10 +1,10 @@
 use lapin::{
-    options::{BasicPublishOptions, QueueDeclareOptions},
+    options::{BasicPublishOptions, QueueDeclareOptions, BasicConsumeOptions},
     types::FieldTable,
     BasicProperties,
 };
 
-use super::{PublishConfig, QueueConfig};
+use super::{ConsumeConfig, PublishConfig, QueueConfig};
 
 const NAME: &str = "portal_message";
 pub fn queue_portal_message() -> QueueConfig {
@@ -21,5 +21,13 @@ pub fn publish_portal_message() -> PublishConfig {
         exchange: "".to_string(),
         options: BasicPublishOptions::default(),
         properties: BasicProperties::default(),
+    }
+}
+
+pub fn consume_portal_message() -> ConsumeConfig {
+    ConsumeConfig {
+        name: NAME.to_string(),
+        options: BasicConsumeOptions::default(),
+        field_table: FieldTable::default(),
     }
 }

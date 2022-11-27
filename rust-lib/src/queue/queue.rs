@@ -7,8 +7,8 @@ use serde::Serialize;
 
 use super::{
     config::{
-        portal_messsage::{publish_portal_message, queue_portal_message},
-        PublishConfig,
+        portal_messsage::{consume_portal_message, publish_portal_message, queue_portal_message},
+        ConsumeConfig, PublishConfig,
     },
     QueueConfig,
 };
@@ -16,6 +16,7 @@ use super::{
 pub enum Queue {
     PortalMessage,
 }
+
 impl Queue {
     pub fn get_queue_config(self) -> QueueConfig {
         match self {
@@ -26,6 +27,12 @@ impl Queue {
     pub fn get_publish_config(self) -> PublishConfig {
         match self {
             Queue::PortalMessage => publish_portal_message(),
+        }
+    }
+
+    pub fn get_consume_config(self) -> ConsumeConfig {
+        match self {
+            Queue::PortalMessage => consume_portal_message(),
         }
     }
 
@@ -55,6 +62,18 @@ impl Queue {
                 &json,
                 config.properties,
             )
+            .await?)
+    }
+
+    pub async fn consume(
+        self,
+        channel: &Channel,
+        tag: Option<String>,
+    ) -> Result<lapin::Consumer, Box<dyn Error>> {
+        let tag = tag.unwrap_or("".to_string());
+        let config = self.get_consume_config();
+        Ok(channel
+            .basic_consume(&config.name, &tag, config.options, config.field_table)
             .await?)
     }
 }
