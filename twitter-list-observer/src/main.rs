@@ -1,21 +1,39 @@
 mod env;
-mod queue;
 mod twitter;
 
-use crate::queue::message::Convert;
 use futures::{pin_mut, prelude::*};
+use rust_lib::custom_error::OptionalError;
+use rust_lib::db::get_client;
+// use rust_lib::dto::portal::Message;
+use rust_lib::otor;
 use rust_lib::queue::get_pool;
 use rust_lib::{env::load_env, queue::Queue};
+use std::collections::VecDeque;
 use std::error::Error;
+use surrealdb_rs::param::from_value;
 use tokio::time::{sleep, Duration};
 use tracing::{error, info, warn};
 use twitter::{get_api_app_ctx, query_stream, Rule};
+use twitter::Message;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     tracing_subscriber::fmt::init();
 
     load_env()?;
+    info!("loaded .env");
+
+    let db = get_client("test", "test").await?;
+    info!("connected");
+    //
+    // let messages = db
+    //     .query("select *, (select *, ->tags__channels.out.* as channels from (select in from message:lapriere1<-tags__messages) fetch channels.portal_platform) as tags from message:lapriere1 fetch author, author.source_platform, source_platform, tags, tags->tags__channels")
+    //     .await?;
+    // let message_object = otor!(otor!(messages.get(0))?.clone()?.get(0))?.to_owned();
+    // let message:Message = from_value(&message_object)?;
+    // info!("{:?}", message);
+    //
+    // Ok(())
 
     let twitter = get_api_app_ctx()?;
 
@@ -52,7 +70,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 }
             };
 
-            let message = match payload.convert() {
+            let message: Message = match payload.try_into() {
                 Ok(ok) => ok,
                 Err(err) => {
                     warn!("fail to convert tweet to message:{:?}", err);

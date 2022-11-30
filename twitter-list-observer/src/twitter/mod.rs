@@ -1,8 +1,11 @@
-pub mod stream;
-pub use stream::*;
-
-pub mod rules;
-pub use rules::*;
-
 pub mod client;
+pub mod message;
+pub mod rules;
+pub mod stream;
+pub mod user;
+
 pub use client::*;
+pub use message::*;
+pub use rules::*;
+pub use stream::*;
+pub use user::*;

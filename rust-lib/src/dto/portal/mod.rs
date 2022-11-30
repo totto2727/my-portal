@@ -1,11 +1,11 @@
-pub mod channle;
+pub mod channel;
 pub mod message;
 pub mod portal_platform;
 pub mod source_platform;
 pub mod tag;
 pub mod user;
 
-pub use channle::*;
+pub use channel::*;
 pub use message::*;
 pub use portal_platform::*;
 pub use source_platform::*;

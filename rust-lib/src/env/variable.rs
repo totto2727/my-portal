@@ -1,4 +1,4 @@
-use std::env::VarError;
+use std::env::{VarError, var};
 
 type Result<T> = std::result::Result<T, VarError>;
 
@@ -7,14 +7,22 @@ pub fn env_redis_url() -> Result<String> {
 }
 
 pub fn env_rabbitmq_user() -> Result<String> {
-    std::env::var("RABBITMQ_USER")
+    var("RABBITMQ_USER")
 }
 pub fn env_rabbitmq_pass() -> Result<String> {
-    std::env::var("RABBITMQ_PASS")
+    var("RABBITMQ_PASS")
 }
 pub fn env_rabbitmq_domain() -> Result<String> {
-    std::env::var("RABBITMQ_DOMAIN")
+    var("RABBITMQ_DOMAIN")
 }
 pub fn env_rabbitmq_port() -> Result<String> {
-    std::env::var("RABBITMQ_PORT")
+    var("RABBITMQ_PORT")
+}
+
+pub fn env_surrealdb_user() -> Result<String> {
+    var("SURREALDB_USER")
+}
+
+pub fn env_surrealdb_password() -> Result<String> {
+    var("SURREALDB_PASSWORD")
 }
