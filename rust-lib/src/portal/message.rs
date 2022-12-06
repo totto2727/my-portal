@@ -1,6 +1,6 @@
 use super::source_platform::SourcePlatform;
 use super::Tag;
-use crate::dto;
+use crate::database::portal;
 use crate::portal::User;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
@@ -16,15 +16,15 @@ pub struct Message {
     pub author: User,
 }
 
-impl From<dto::portal::Message> for Message {
-    fn from(dto: dto::portal::Message) -> Self {
+impl From<portal::Message> for Message {
+    fn from(value: portal::Message) -> Self {
         Message {
-            id: dto.id_in_platform,
-            text: dto.text,
-            created_at: dto.created_at,
-            source_platform: dto.source_platform.into(),
-            author: dto.author.into(),
-            tags: dto.tags.iter().map(|t| t.clone().into()).collect(),
+            id: value.id_in_platform,
+            text: value.text,
+            created_at: value.created_at,
+            source_platform: value.source_platform.into(),
+            author: value.author.into(),
+            tags: value.tags.iter().map(|t| t.clone().into()).collect(),
         }
     }
 }

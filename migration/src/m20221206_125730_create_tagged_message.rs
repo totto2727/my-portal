@@ -1,7 +1,7 @@
 use rust_lib::portal;
 use sea_orm_migration::prelude::*;
 
-use crate::{m20221203_185943_create_tag::Tag, m20221205_230421_create_channel::Channel};
+use crate::{m20221203_185943_create_tag::Tag, m20221206_125718_create_message::Message};
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -12,44 +12,44 @@ impl MigrationTrait for Migration {
         manager
             .create_table(
                 Table::create()
-                    .table(TaggedChannel::Table)
+                    .table(TaggedMessage::Table)
                     .if_not_exists()
-                    .col(ColumnDef::new(TaggedChannel::Tag).string().not_null())
-                    .col(ColumnDef::new(TaggedChannel::ChannelId).string())
-                    .col(ColumnDef::new(TaggedChannel::PortalPlatform).string())
+                    .col(ColumnDef::new(TaggedMessage::Tag).string())
+                    .col(ColumnDef::new(TaggedMessage::MessageId).string())
+                    .col(ColumnDef::new(TaggedMessage::SourcePlatform).string())
                     .col(
-                        ColumnDef::new(TaggedChannel::CreatedAt)
+                        ColumnDef::new(TaggedMessage::CreatedAt)
                             .timestamp_with_time_zone()
                             .not_null()
                             .default(Expr::current_timestamp()),
                     )
                     .col(
-                        ColumnDef::new(TaggedChannel::UpdatedAt)
+                        ColumnDef::new(TaggedMessage::UpdatedAt)
                             .timestamp_with_time_zone()
                             .not_null()
                             .default(Expr::current_timestamp()),
                     )
                     .primary_key(
                         Index::create()
-                            .col(TaggedChannel::PortalPlatform)
-                            .col(TaggedChannel::Tag)
-                            .col(TaggedChannel::ChannelId),
+                            .col(TaggedMessage::SourcePlatform)
+                            .col(TaggedMessage::Tag)
+                            .col(TaggedMessage::MessageId),
                     )
                     .foreign_key(
                         ForeignKeyCreateStatement::new()
-                            .from(TaggedChannel::Table, TaggedChannel::Tag)
+                            .from(TaggedMessage::Table, TaggedMessage::Tag)
                             .to(Tag::Table, Tag::Name)
                             .on_update(ForeignKeyAction::Cascade)
                             .on_delete(ForeignKeyAction::Cascade),
                     )
                     .foreign_key(
                         ForeignKeyCreateStatement::new()
-                            .from_tbl(TaggedChannel::Table)
-                            .from_col(TaggedChannel::ChannelId)
-                            .from_col(TaggedChannel::PortalPlatform)
-                            .to_tbl(Channel::Table)
-                            .to_col(Channel::Id)
-                            .to_col(Channel::PortalPlatform)
+                            .from_tbl(TaggedMessage::Table)
+                            .from_col(TaggedMessage::MessageId)
+                            .from_col(TaggedMessage::SourcePlatform)
+                            .to_tbl(Message::Table)
+                            .to_col(Message::Id)
+                            .to_col(Message::SourcePlatform)
                             .on_update(ForeignKeyAction::Cascade)
                             .on_delete(ForeignKeyAction::Cascade),
                     )
@@ -60,24 +60,24 @@ impl MigrationTrait for Migration {
         manager
             .exec_stmt(
                 Query::insert()
-                    .into_table(TaggedChannel::Table)
+                    .into_table(TaggedMessage::Table)
                     .columns([
-                        TaggedChannel::ChannelId,
-                        TaggedChannel::PortalPlatform,
-                        TaggedChannel::Tag,
+                        TaggedMessage::MessageId,
+                        TaggedMessage::SourcePlatform,
+                        TaggedMessage::Tag,
                     ])
                     .on_conflict(
                         OnConflict::columns([
-                            TaggedChannel::ChannelId,
-                            TaggedChannel::PortalPlatform,
-                            TaggedChannel::Tag,
+                            TaggedMessage::MessageId,
+                            TaggedMessage::SourcePlatform,
+                            TaggedMessage::Tag,
                         ])
                         .do_nothing()
                         .to_owned(),
                     )
                     .values_panic([
-                        "C03BVNQD6T1".into(),
-                        portal::PortalPlatform::Slack.to_string().into(),
+                        "1598980368920678400".into(),
+                        portal::SourcePlatform::Twitter.to_string().into(),
                         "La priere".into(),
                     ])
                     .to_owned(),
@@ -89,18 +89,18 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager
-            .drop_table(Table::drop().table(TaggedChannel::Table).to_owned())
+            .drop_table(Table::drop().table(TaggedMessage::Table).to_owned())
             .await
     }
 }
 
 /// Learn more at https://docs.rs/sea-query#iden
 #[derive(Iden)]
-enum TaggedChannel {
+enum TaggedMessage {
     Table,
+    MessageId,
+    SourcePlatform,
     Tag,
-    ChannelId,
-    PortalPlatform,
     CreatedAt,
     UpdatedAt,
 }

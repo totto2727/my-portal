@@ -1,17 +1,20 @@
 use serde::{Deserialize, Serialize};
-use strum_macros::EnumString;
+use strum_macros::{EnumIter, IntoStaticStr};
 
-use crate::dto;
-
-#[derive(Debug, EnumString, Serialize, Deserialize, Clone)]
+#[derive(
+    Debug,
+    PartialEq,
+    Clone,
+    Copy,
+    Serialize,
+    Deserialize,
+    strum_macros::EnumString,
+    strum_macros::Display,
+    IntoStaticStr,
+    EnumIter,
+)]
 pub enum PortalPlatform {
     #[strum(serialize = "slack")]
     #[serde(alias = "slack")]
     Slack,
-}
-
-impl From<dto::portal::PortalPlatform> for PortalPlatform {
-    fn from(dto: dto::portal::PortalPlatform) -> Self {
-        dto.name
-    }
 }

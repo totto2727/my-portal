@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::dto;
+use crate::database::portal;
 
 use super::Channel;
 
@@ -10,11 +10,11 @@ pub struct Tag {
     pub channels: Vec<Channel>,
 }
 
-impl From<dto::portal::Tag> for Tag {
-    fn from(dto: dto::portal::Tag) -> Self {
+impl From<portal::Tag> for Tag {
+    fn from(value: portal::Tag) -> Self {
         Tag {
-            name: dto.name,
-            channels: dto
+            name: value.name,
+            channels: value
                 .channels
                 .iter()
                 .map(|c| -> Channel { c.clone().into() })

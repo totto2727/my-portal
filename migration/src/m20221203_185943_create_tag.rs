@@ -12,6 +12,18 @@ impl MigrationTrait for Migration {
                     .table(Tag::Table)
                     .if_not_exists()
                     .col(ColumnDef::new(Tag::Name).string().primary_key())
+                    .col(
+                        ColumnDef::new(Tag::CreatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null()
+                            .default(Expr::current_timestamp()),
+                    )
+                    .col(
+                        ColumnDef::new(Tag::UpdatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null()
+                            .default(Expr::current_timestamp()),
+                    )
                     .to_owned(),
             )
             .await?;
@@ -42,4 +54,6 @@ impl MigrationTrait for Migration {
 pub enum Tag {
     Table,
     Name,
+    CreatedAt,
+    UpdatedAt,
 }

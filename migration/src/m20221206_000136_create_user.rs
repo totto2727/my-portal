@@ -18,13 +18,25 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Users::SourcePlatform).string())
                     .col(ColumnDef::new(Users::Name).string().not_null())
                     .col(ColumnDef::new(Users::DisplayName).string())
+                    .col(
+                        ColumnDef::new(Users::CreatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null()
+                            .default(Expr::current_timestamp())
+                    )
+                    .col(
+                        ColumnDef::new(Users::UpdatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null()
+                            .default(Expr::current_timestamp()),
+                    )
                     .primary_key(Index::create().col(Users::Id).col(Users::SourcePlatform))
                     .foreign_key(
                         ForeignKeyCreateStatement::new()
                             .from(Users::Table, Users::SourcePlatform)
                             .to(SourcePlatform::Table, SourcePlatform::Name)
                             .on_update(ForeignKeyAction::Cascade)
-                            .on_delete(ForeignKeyAction::Cascade),
+                            .on_delete(ForeignKeyAction::NoAction),
                     )
                     .to_owned(),
             )
@@ -73,4 +85,6 @@ pub enum Users {
     SourcePlatform,
     Name,
     DisplayName,
+    CreatedAt,
+    UpdatedAt,
 }

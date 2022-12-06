@@ -9,6 +9,8 @@ mod m20221205_230421_create_channel;
 mod m20221205_230434_create_tagged_channel;
 mod m20221206_000136_create_user;
 mod m20221206_000154_create_tagged_user;
+mod m20221206_125718_create_message;
+mod m20221206_125730_create_tagged_message;
 
 pub struct Migrator;
 
@@ -25,6 +27,8 @@ impl MigratorTrait for Migrator {
             Box::new(m20221205_230434_create_tagged_channel::Migration),
             Box::new(m20221206_000136_create_user::Migration),
             Box::new(m20221206_000154_create_tagged_user::Migration),
+            Box::new(m20221206_125718_create_message::Migration),
+            Box::new(m20221206_125730_create_tagged_message::Migration),
         ]
     }
 }

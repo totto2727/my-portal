@@ -16,6 +16,18 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(TaggedRule::Tag).string())
                     .col(ColumnDef::new(TaggedRule::Rule).string())
                     .col(ColumnDef::new(TaggedRule::SourcePlatform).string())
+                    .col(
+                        ColumnDef::new(TaggedRule::CreatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null()
+                            .default(Expr::current_timestamp()),
+                    )
+                    .col(
+                        ColumnDef::new(TaggedRule::UpdatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null()
+                            .default(Expr::current_timestamp()),
+                    )
                     .primary_key(
                         Index::create()
                             .col(TaggedRule::SourcePlatform)
@@ -88,4 +100,6 @@ enum TaggedRule {
     Tag,
     Rule,
     SourcePlatform,
+    CreatedAt,
+    UpdatedAt,
 }

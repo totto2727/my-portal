@@ -17,6 +17,18 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Channel::Id).string())
                     .col(ColumnDef::new(Channel::PortalPlatform).string())
                     .col(ColumnDef::new(Channel::Name).string().not_null())
+                    .col(
+                        ColumnDef::new(Channel::CreatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null()
+                            .default(Expr::current_timestamp()),
+                    )
+                    .col(
+                        ColumnDef::new(Channel::UpdatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null()
+                            .default(Expr::current_timestamp()),
+                    )
                     .primary_key(
                         Index::create()
                             .col(Channel::PortalPlatform)
@@ -27,7 +39,7 @@ impl MigrationTrait for Migration {
                             .from(Channel::Table, Channel::PortalPlatform)
                             .to(PortalPlatform::Table, PortalPlatform::Name)
                             .on_update(ForeignKeyAction::Cascade)
-                            .on_delete(ForeignKeyAction::Cascade),
+                            .on_delete(ForeignKeyAction::NoAction),
                     )
                     .to_owned(),
             )
@@ -69,4 +81,6 @@ pub enum Channel {
     Id,
     PortalPlatform,
     Name,
+    CreatedAt,
+    UpdatedAt,
 }

@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::dto;
+use crate::database::portal;
 
 use super::PortalPlatform;
 
@@ -11,12 +11,12 @@ pub struct Channel {
     pub portal_paltform: PortalPlatform,
 }
 
-impl From<dto::portal::Channel> for Channel {
-    fn from(dto: dto::portal::Channel) -> Self {
+impl From<portal::Channel> for Channel {
+    fn from(value: portal::Channel) -> Self {
         Channel {
-            id: dto.id_in_platform.clone(),
-            name: dto.name,
-            portal_paltform: dto.portal_platform.name,
+            id: value.id_in_platform.clone(),
+            name: value.name,
+            portal_paltform: value.portal_platform.name,
         }
     }
 }

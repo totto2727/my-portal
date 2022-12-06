@@ -1,4 +1,4 @@
-use std::env::{VarError, var};
+use std::env::{var, VarError};
 
 type Result<T> = std::result::Result<T, VarError>;
 
@@ -25,4 +25,20 @@ pub fn env_surrealdb_user() -> Result<String> {
 
 pub fn env_surrealdb_password() -> Result<String> {
     var("SURREALDB_PASSWORD")
+}
+
+pub fn env_postgres_user() -> Result<String> {
+    var("POSTGRES_USER")
+}
+
+pub fn env_postgres_password() -> Result<String> {
+    var("POSTGRES_PASSWORD")
+}
+
+pub fn env_postgres_db() -> Result<String> {
+    var("POSTGRES_DB")
+}
+
+pub fn env_postgres_domain() -> Result<String> {
+    var("POSTGRES_DOMAIN")
 }

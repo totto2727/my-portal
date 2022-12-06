@@ -16,13 +16,25 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Rule::Name).string())
                     .col(ColumnDef::new(Rule::SourcePlatform).string())
                     .col(ColumnDef::new(Rule::Text).string().not_null())
+                    .col(
+                        ColumnDef::new(Rule::CreatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null()
+                            .default(Expr::current_timestamp()),
+                    )
+                    .col(
+                        ColumnDef::new(Rule::UpdatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null()
+                            .default(Expr::current_timestamp()),
+                    )
                     .primary_key(Index::create().col(Rule::SourcePlatform).col(Rule::Name))
                     .foreign_key(
                         ForeignKeyCreateStatement::new()
                             .from(Rule::Table, Rule::SourcePlatform)
                             .to(SourcePlatform::Table, SourcePlatform::Name)
                             .on_update(ForeignKeyAction::Cascade)
-                            .on_delete(ForeignKeyAction::Cascade),
+                            .on_delete(ForeignKeyAction::NoAction),
                     )
                     .to_owned(),
             )
@@ -64,4 +76,6 @@ pub enum Rule {
     Name,
     SourcePlatform,
     Text,
+    CreatedAt,
+    UpdatedAt,
 }

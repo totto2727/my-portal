@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::dto;
+use crate::database::portal;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct User {
@@ -10,12 +10,12 @@ pub struct User {
     pub user_name: String,
 }
 
-impl From<dto::portal::User> for User {
-    fn from(dto: dto::portal::User) -> Self {
+impl From<portal::User> for User {
+    fn from(value: portal::User) -> Self {
         User {
-            id: dto.id_in_platform,
-            user_display_name: dto.user_display_name,
-            user_name: dto.user_name,
+            id: value.id_in_platform,
+            user_display_name: value.user_display_name,
+            user_name: value.user_name,
         }
     }
 }

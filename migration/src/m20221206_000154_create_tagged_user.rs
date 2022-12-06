@@ -17,6 +17,18 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(TaggedUser::Tag).string())
                     .col(ColumnDef::new(TaggedUser::UserId).string())
                     .col(ColumnDef::new(TaggedUser::SourcePlatform).string())
+                    .col(
+                        ColumnDef::new(TaggedUser::CreatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null()
+                            .default(Expr::current_timestamp()),
+                    )
+                    .col(
+                        ColumnDef::new(TaggedUser::UpdatedAt)
+                            .timestamp_with_time_zone()
+                            .not_null()
+                            .default(Expr::current_timestamp()),
+                    )
                     .primary_key(
                         Index::create()
                             .col(TaggedUser::SourcePlatform)
@@ -89,4 +101,6 @@ pub enum TaggedUser {
     Tag,
     UserId,
     SourcePlatform,
+    CreatedAt,
+    UpdatedAt,
 }
