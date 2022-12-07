@@ -28,6 +28,6 @@ impl error::Error for OptionalError {
 #[macro_export]
 macro_rules! otor {
     ($x:expr) => {
-        $x.ok_or(OptionalError::new(String::from("$x")))
+        $x.ok_or(OptionalError::new("$x".to_owned()))
     };
 }
