@@ -1739,6 +1739,7 @@ dependencies = [
  "tokio",
  "tokio-serde",
  "tokio-stream",
+ "twitter-v2",
 ]
 
 [[package]]

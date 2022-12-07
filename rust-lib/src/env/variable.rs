@@ -42,3 +42,7 @@ pub fn env_postgres_db() -> Result<String> {
 pub fn env_postgres_domain() -> Result<String> {
     var("POSTGRES_DOMAIN")
 }
+
+pub fn env_twitter_bearer() -> Result<String> {
+    var("TWITTER_BEARER")
+}

@@ -19,4 +19,5 @@ deadpool = { version = "0.9.5", features = ["managed", "rt_tokio_1"], default-fe
 deadpool-lapin = { version = "0.10.0", features = ["rt_tokio_1"], default-features = false }
 sea-orm = { version = "^0.10.0", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros", "with-chrono"], default-features = false  }
 sea-orm-migration = { version = "^0.10.0", features = ["sqlx-postgres", "runtime-tokio-rustls"], default-features = false  }
+twitter-v2 = { git = "https://github.com/totto2727/twitter-v2-rs", rev ="d717a04f3fce245f62a7936308e7402d8e0c5c2a", default-features = false, features = ["rustls-tls"] }
 derive-getters = "0.2.0"
