@@ -1,28 +1,32 @@
+use derive_getters::Getters;
 use tracing::{error, info, warn};
-use twitter_v2::{self, data::StreamRule, requests::StreamRuleBuilder, Authorization, TwitterApi};
+use twitter_v2::{data::StreamRule, requests::StreamRuleBuilder, Authorization, TwitterApi};
 
+#[derive(Debug, Clone, Getters)]
 pub struct Rule {
-    pub tag: String,
-    pub value: String,
+    tag: String,
+    text: String,
 }
 
 impl Rule {
-    pub fn new<S: Into<String>>(tag: S, value: S) -> Rule {
+    fn new<S: Into<String>>(tag: S, value: S) -> Rule {
         Rule {
             tag: tag.into(),
-            value: value.into(),
+            text: value.into(),
         }
     }
 
+    // TODO test
     pub fn add_tagged_rules_to_request<T: Authorization>(
         builder: &mut StreamRuleBuilder<T>,
         rules: &[Rule],
     ) {
         for rule in rules.iter() {
-            builder.add_tagged(rule.value.clone(), rule.tag.clone());
+            builder.add_tagged(rule.text.clone(), rule.tag.clone());
         }
     }
 
+    // TODO test
     pub async fn query_reset_rules<T: Authorization>(
         client: &TwitterApi<T>,
     ) -> Result<(), twitter_v2::Error> {
@@ -45,6 +49,7 @@ impl Rule {
         Ok(())
     }
 
+    // TODO test
     pub async fn query_initialize_rules<T: Authorization>(
         client: &TwitterApi<T>,
         rules: &[Rule],

@@ -1,11 +1,10 @@
 pub mod client;
-pub mod message;
-pub mod rules;
 pub mod stream;
-pub mod user;
+pub mod usecase;
+pub mod domain;
+pub mod infrastructure;
+pub mod service;
+pub mod di;
 
 pub use client::*;
-pub use message::*;
-pub use rules::*;
 pub use stream::*;
-pub use user::*;
