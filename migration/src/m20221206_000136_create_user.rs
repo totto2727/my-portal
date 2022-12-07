@@ -60,7 +60,7 @@ impl MigrationTrait for Migration {
                     .values_panic([
                         "1222832820906680320".into(),
                         portal::SourcePlatform::Twitter.to_string().into(),
-                        "@Lapriere_info".into(),
+                        "Lapriere_info".into(),
                         "La prière".into(),
                     ])
                     .to_owned(),
