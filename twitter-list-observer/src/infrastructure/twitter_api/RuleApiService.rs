@@ -1,4 +1,4 @@
-use crate::twitter::domain::service::rule_api_service::{RuleApiService, RuleApiServiceTrait};
+use crate::domain::service::rule_api_service::{RuleApiService, RuleApiServiceTrait};
 use async_trait::async_trait;
 use twitter_v2::{authorization::BearerToken, Authorization, Error, TwitterApi};
 

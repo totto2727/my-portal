@@ -1,4 +1,4 @@
-use crate::twitter::domain::model::user::User;
+use crate::domain::model::user::User;
 
 pub struct RuleService {}
 
@@ -29,7 +29,7 @@ impl RuleServiceTrait for RuleService {
 
 #[cfg(test)]
 mod tests {
-    use crate::twitter::domain::{
+    use crate::domain::{
         model::user::User,
         service::rule_service::{RuleService, RuleServiceTrait},
     };

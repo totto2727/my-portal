@@ -1,4 +1,4 @@
-use crate::twitter::domain::{
+use crate::domain::{
     model::tag::Tag,
     repository::tag_repository::{TagRepository, TagRepositoryTrait},
 };

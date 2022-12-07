@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 
-use crate::twitter::domain::model::tag::Tag;
+use crate::domain::model::tag::Tag;
 
 pub struct TagRepository<'a, Source: 'a> {
     pub source: &'a Source,
