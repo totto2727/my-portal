@@ -1,5 +1,5 @@
 use rust_lib::database::entity::tag;
-use rust_lib::database::IntoActiveModel;
+use rust_lib::database::sea_orm::IntoActiveModel;
 use sea_orm::ActiveValue::NotSet;
 use sea_orm::ActiveValue::Set;
 use serde::{Deserialize, Serialize};
