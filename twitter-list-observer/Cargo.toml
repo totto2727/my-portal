@@ -23,6 +23,9 @@ deadpool = "0.9.5"
 deadpool-lapin = "0.10.0"
 sea-orm = { version = "^0.10.0", features = [ "sqlx-postgres", "runtime-tokio-rustls", "macros", "with-chrono" ], default-features = false  }
 derive-getters = "0.2.0"
+mockall = "0.11.3"
+thiserror = "1.0"
+anyhow = "1.0"
 rust-lib = { path = "../rust-lib" }
 
 [dev-dependencies]

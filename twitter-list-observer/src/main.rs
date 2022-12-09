@@ -1,15 +1,41 @@
-mod lib;
+mod di;
+// mod domain;
+// mod infrastructure;
+// mod service;
+mod tag;
+// mod usecase;
+mod domain;
+mod user;
 
+use di::di;
+use rust_lib::{database::postgres::get_connection, env::load_env, portal::SourcePlatform};
 use std::error::Error;
+use tag::tag_repository_trait::TagRepositoryTrait;
+use tracing::{error, info};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
+    tracing_subscriber::fmt::init();
+    load_env()?;
+    info!("loaded .env");
+
+    let database = match get_connection().await {
+        Ok(ok) => ok,
+        Err(err) => {
+            error!(err);
+            return Err(err);
+        }
+    };
+    let di_ = di(&database);
+    let tags = di_
+        .tag_repository()
+        .find_filter_source_platform(SourcePlatform::Twitter)
+        .await?;
+
+    println!("{:?}", tags);
+
     Ok(())
-    // tracing_subscriber::fmt::init();
-    //
-    // load_env()?;
-    // info!("loaded .env");
-    //
+
     // let database_connection = database::get_connection().await?;
     // info!("connected");
     //

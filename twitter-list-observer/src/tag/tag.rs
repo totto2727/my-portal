@@ -1,10 +1,10 @@
+use derive_getters::Getters;
 use rust_lib::database::entity::tag;
 use rust_lib::database::sea_orm::IntoActiveModel;
 use sea_orm::ActiveValue::NotSet;
 use sea_orm::ActiveValue::Set;
-use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Getters)]
 pub struct Tag {
     name: String,
 }

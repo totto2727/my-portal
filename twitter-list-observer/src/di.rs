@@ -1,12 +1,30 @@
+use derive_getters::Getters;
 use sea_orm::DatabaseConnection;
-use twitter_v2::{authorization::BearerToken, TwitterApi};
 
-use super::domain::{
-    repository::tag_repository::TagRepository, service::rule_api_service::RuleApiService,
-};
+use crate::tag::tag_repository_impl::TagRepository;
+// use twitter_v2::{authorization::BearerToken, TwitterApi};
 
-pub fn di(sea_orm: DatabaseConnection, twitter_api: TwitterApi<BearerToken>) -> () {
-    let tab_repository = TagRepository::new(&sea_orm);
+#[derive(Getters)]
+pub struct Repositories<'a> {
+    tag_repository: TagRepository<'a>,
+}
 
-    let rule_repository = RuleApiService::new(&twitter_api);
+// #[derive(Getters)]
+// pub struct Clients<'a> {}
+//
+// #[derive(Getters)]
+// pub struct DomainServices<'a> {}
+//
+// #[derive(Getters)]
+// pub struct ApplicationServices<'a> {}
+
+pub fn di<'a>(
+    sea_orm: &'a DatabaseConnection,
+    // twitter_api: TwitterApi<BearerToken>,
+) -> Repositories<'a> {
+    let tag_repository = TagRepository::new(sea_orm);
+
+    let rp = Repositories { tag_repository };
+
+    return rp;
 }
