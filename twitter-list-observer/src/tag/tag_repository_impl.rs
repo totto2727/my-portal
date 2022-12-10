@@ -1,18 +1,18 @@
 use super::{tag::Tag, tag_repository_trait::TagRepositoryTrait};
-use crate::domain::Result;
-use crate::user::user::User;
+use crate::{domain::Result, rule::rule_part::RulePart, user::user::User};
 use async_trait::async_trait;
 use derive_getters::Getters;
+use itertools::Itertools;
 use rust_lib::{
-    database::entity::{tagged_rule, tagged_user},
+    database::entity::{rule, tagged_rule, tagged_user, users},
     portal::SourcePlatform,
 };
 use sea_orm::{
     prelude::*,
-    sea_query::{Query, QueryBuilder, UnionType},
-    DbBackend, FromQueryResult, QuerySelect, Statement,
+    sea_query::{Query, UnionType},
+    Condition, DbBackend, FromQueryResult, QuerySelect,
 };
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Getters)]
 pub struct TagRepository<'a> {
@@ -32,11 +32,11 @@ impl<'a> TagRepositoryTrait for TagRepository<'a> {
         source_platform: SourcePlatform,
     ) -> Result<HashSet<Tag>> {
         #[derive(FromQueryResult)]
-        struct TagName {
+        struct QueryAs {
             tag: String,
         }
 
-        let stmt = Query::select()
+        let sub_query = Query::select()
             .column(tagged_user::Column::Tag)
             .distinct()
             .and_where(tagged_user::Column::SourcePlatform.eq(source_platform.to_string()))
@@ -51,45 +51,75 @@ impl<'a> TagRepositoryTrait for TagRepository<'a> {
                     .to_owned(),
             )])
             .to_owned();
-        // .build::<QueryBuilder>(DbBackend::Postgres.get_query_builder());
 
         let tags: HashSet<Tag> = tagged_user::Entity::find()
             .select_only()
             .distinct()
             .filter(tagged_user::Column::SourcePlatform.eq(source_platform.to_string()))
-            .from_raw_sql(DbBackend::Postgres.build(&stmt))
-            // .into_values::<_, QueryAs>()
-            .into_model::<TagName>()
+            .from_raw_sql(DbBackend::Postgres.build(&sub_query))
+            .into_model::<QueryAs>()
             .all(self.connection())
             .await?
             .iter()
             .map(|t| t.tag.to_owned().into())
             .collect();
 
-        // let tag_include_rules: Vec<String> = tagged_rule::Entity::find()
-        //     .select_only()
-        //     .column(tagged_rule::Column::Tag)
-        //     .distinct()
-        //     .filter(tagged_rule::Column::SourcePlatform.eq(source_platform.to_string()))
-        //     .into_values::<_, QueryAs>()
-        //     .all(self.connection())
-        //     .await?;
-        //
-        // let tags: HashSet<Tag> = tag_include_users
-        //     .into_iter()
-        //     .chain(tag_include_rules)
-        //     .collect::<HashSet<String>>()
-        //     .iter()
-        //     .map(|t| t.to_owned().into())
-        //     .collect();
-
         Ok(tags)
     }
-    // async fn find_all_tagged_user(
-    //     &self,
-    //     source_platform: SourcePlatform,
-    //     tag: Tag,
-    // ) -> Result<Vec<User>, Self::Error> {
-    //     Ok(Vec::new())
-    // }
+
+    async fn find_all_tagged_user(
+        &self,
+        source_platform: SourcePlatform,
+        tags: HashSet<Tag>,
+    ) -> Result<HashMap<Tag, HashSet<User>>> {
+        let tagged_users: HashMap<Tag, HashSet<User>> = tagged_user::Entity::find()
+            .filter(
+                Condition::all()
+                    .add(tagged_user::Column::Tag.is_in(tags.iter().map(|t| t.name().to_owned())))
+                    .add(tagged_user::Column::SourcePlatform.eq(source_platform.to_string())),
+            )
+            .find_also_related(users::Entity)
+            .all(self.connection())
+            .await?
+            .into_iter()
+            .filter_map(|(tag, user_o)| {
+                user_o
+                    .to_owned()
+                    .map(|user| (Tag::from(tag.to_owned()), User::from(user)))
+            })
+            .into_group_map()
+            .into_iter()
+            .map(|(k, v)| (k, HashSet::from_iter(v)))
+            .collect();
+
+        Ok(tagged_users)
+    }
+
+    async fn find_all_tagged_rule_parts(
+        &self,
+        source_platform: SourcePlatform,
+        tags: HashSet<Tag>,
+    ) -> Result<HashMap<Tag, HashSet<RulePart>>> {
+        let tagged_rules: HashMap<Tag, HashSet<RulePart>> = tagged_rule::Entity::find()
+            .filter(
+                Condition::all()
+                    .add(tagged_rule::Column::Tag.is_in(tags.iter().map(|t| t.name().to_owned())))
+                    .add(tagged_rule::Column::SourcePlatform.eq(source_platform.to_string())),
+            )
+            .find_also_related(rule::Entity)
+            .all(self.connection())
+            .await?
+            .into_iter()
+            .filter_map(|(tag, rule_o)| {
+                rule_o
+                    .to_owned()
+                    .map(|rule| (Tag::from(tag.to_owned()), RulePart::from(rule)))
+            })
+            .into_group_map()
+            .into_iter()
+            .map(|(k, v)| (k, HashSet::from_iter(v)))
+            .collect();
+
+        Ok(tagged_rules)
+    }
 }
