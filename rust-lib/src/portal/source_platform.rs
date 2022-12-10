@@ -4,8 +4,10 @@ use strum_macros::{EnumIter, IntoStaticStr};
 #[derive(
     Debug,
     PartialEq,
+    Eq,
     Clone,
     Copy,
+    Hash,
     Serialize,
     Deserialize,
     strum_macros::EnumString,
