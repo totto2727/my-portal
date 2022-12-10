@@ -2672,6 +2672,7 @@ dependencies = [
  "deadpool-lapin",
  "derive-getters",
  "futures",
+ "itertools",
  "lapin",
  "mockall",
  "rust-lib",
