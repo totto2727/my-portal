@@ -1,6 +1,7 @@
-use std::{error, fmt};
+use thiserror::Error;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Error)]
+#[error("None:{field}")]
 pub struct OptionalError {
     field: String,
 }
@@ -13,21 +14,11 @@ impl OptionalError {
     }
 }
 
-impl fmt::Display for OptionalError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "None:{}", self.field)
+mod macros {
+    #[macro_export]
+    macro_rules! otor {
+        ($x:expr) => {
+            $x.ok_or(rust_lib::custom_error::OptionalError::new("$x".to_owned()))
+        };
     }
-}
-
-impl error::Error for OptionalError {
-    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
-        None
-    }
-}
-
-#[macro_export]
-macro_rules! otor {
-    ($x:expr) => {
-        $x.ok_or(OptionalError::new("$x".to_owned()))
-    };
 }
