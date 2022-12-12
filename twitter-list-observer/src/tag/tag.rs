@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use derive_getters::Getters;
 use rust_lib::database::entity::tag;
 use rust_lib::database::entity::tagged_rule;
@@ -17,9 +19,15 @@ impl Tag {
     }
 }
 
+impl Display for Tag {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.name())
+    }
+}
+
 impl From<String> for Tag {
-    fn from(string: String) -> Self {
-        Self::new(string)
+    fn from(value: String) -> Self {
+        Self::new(value)
     }
 }
 

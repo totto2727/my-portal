@@ -61,7 +61,7 @@ impl<'a> TagRepositoryTrait for TagRepository<'a> {
             .all(self.connection())
             .await?
             .iter()
-            .map(|t| t.tag.to_owned().into())
+            .map(|t| t.tag.clone().into())
             .collect();
 
         Ok(tags)
