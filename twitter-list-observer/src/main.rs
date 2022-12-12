@@ -5,13 +5,22 @@ mod di;
 mod tag;
 // mod usecase;
 mod domain;
+mod rule;
 mod user;
 
 use di::di;
+use itertools::Itertools;
+use rule::rule_part::RulePart;
 use rust_lib::{database::postgres::get_connection, env::load_env, portal::SourcePlatform};
-use std::error::Error;
-use tag::tag_repository_trait::TagRepositoryTrait;
+use std::{
+    collections::{HashMap, HashSet},
+    error::Error,
+};
+use tag::{tag::Tag, tag_repository_trait::TagRepositoryTrait};
 use tracing::{error, info};
+use user::user::User;
+
+use crate::rule::rule::Rule;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -31,8 +40,39 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .tag_repository()
         .find_filter_source_platform(SourcePlatform::Twitter)
         .await?;
-
     println!("{:?}", tags);
+
+    let rules = di_
+        .tag_repository()
+        .find_all_tagged_rule_parts(SourcePlatform::Twitter, tags.clone())
+        .await?;
+    println!("{:?}", rules);
+
+    let users = di_
+        .tag_repository()
+        .find_all_tagged_user(SourcePlatform::Twitter, tags.clone())
+        .await?;
+    println!("{:?}", users);
+
+    let tagged: HashMap<Tag, (Option<HashSet<User>>, Option<HashSet<RulePart>>)> = tags
+        .into_iter()
+        .map(|tag| {
+            (
+                tag.clone(),
+                (
+                    users.get(&tag).map(|users| users.to_owned()),
+                    rules.get(&tag).map(|rules| rules.to_owned()),
+                ),
+            )
+        })
+        .map(|x| x)
+        .collect();
+
+    let rules: HashSet<Rule> = tagged
+        .into_iter()
+        .filter_map(|(t, (us, rps))| Rule::new(SourcePlatform::Twitter, t, rps, us).ok())
+        .collect();
+    println!("{:?}", rules);
 
     Ok(())
 
