@@ -1830,6 +1830,7 @@ dependencies = [
 name = "rust-lib"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "chrono",
  "deadpool",
  "deadpool-lapin",
@@ -1843,6 +1844,7 @@ dependencies = [
  "serde_json",
  "strum",
  "strum_macros",
+ "thiserror",
  "tokio",
  "tokio-serde",
  "tokio-stream",

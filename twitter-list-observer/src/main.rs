@@ -11,7 +11,10 @@ mod user;
 use di::di;
 use itertools::Itertools;
 use rule::rule_part::RulePart;
-use rust_lib::{database::postgres::get_connection, env::load_env, portal::SourcePlatform};
+use rust_lib::{
+    database::postgres::get_connection, env::load_env, portal::SourcePlatform,
+    twitter::client::get_client,
+};
 use std::{
     collections::{HashMap, HashSet},
     error::Error,
@@ -35,20 +38,33 @@ async fn main() -> Result<(), Box<dyn Error>> {
             return Err(err);
         }
     };
-    let di_ = di(&database);
-    let tags = di_
+
+    let twitter = match get_client() {
+        Ok(ok) => ok,
+        Err(err) => {
+            error!("{}", err.to_string());
+            let err = Box::new(err);
+            return Err(err);
+        }
+    };
+
+    let di = di(&database, &twitter);
+    let tags = di
+        .repositories()
         .tag_repository()
         .find_filter_source_platform(SourcePlatform::Twitter)
         .await?;
     println!("{:?}", tags);
 
-    let rules = di_
+    let rules = di
+        .repositories()
         .tag_repository()
         .find_all_tagged_rule_parts(SourcePlatform::Twitter, tags.clone())
         .await?;
     println!("{:?}", rules);
 
-    let users = di_
+    let users = di
+        .repositories()
         .tag_repository()
         .find_all_tagged_user(SourcePlatform::Twitter, tags.clone())
         .await?;

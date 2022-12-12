@@ -1,6 +1,7 @@
 use sea_orm::DatabaseConnection;
+use twitter_v2::{authorization::BearerToken, TwitterApi};
 
-use crate::domain::Repositories;
+use crate::domain::{Clients, Domains, Repositories};
 
 // use twitter_v2::{authorization::BearerToken, TwitterApi};
 
@@ -13,11 +14,10 @@ use crate::domain::Repositories;
 // #[derive(Getters)]
 // pub struct ApplicationServices<'a> {}
 
-pub fn di<'a>(
-    sea_orm: &'a DatabaseConnection,
-    // twitter_api: TwitterApi<BearerToken>,
-) -> Repositories<'a> {
-    let rp = Repositories::new(sea_orm);
+pub fn di<'a>(db: &'a DatabaseConnection, twitter: &'a TwitterApi<BearerToken>) -> Domains<'a> {
+    let rp = Repositories::new(db);
+    let cl = Clients::new(twitter);
 
-    return rp;
+    let domains = Domains::new(rp, cl);
+    domains
 }

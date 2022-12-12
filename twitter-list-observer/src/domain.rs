@@ -1,8 +1,25 @@
 use derive_getters::Getters;
+use rust_lib::custom_error::OptionalError;
 use sea_orm::{DatabaseConnection, DbErr};
 use thiserror::Error;
+use twitter_v2::{authorization::BearerToken, TwitterApi};
 
-use crate::tag::tag_repository_impl::TagRepository;
+use crate::{rule::rule_client_impl::RuleClient, tag::tag_repository_impl::TagRepository};
+
+#[derive(Getters)]
+pub struct Domains<'a> {
+    repositories: Repositories<'a>,
+    clients: Clients<'a>,
+}
+
+impl<'a> Domains<'a> {
+    pub fn new(repositories: Repositories<'a>, clients: Clients<'a>) -> Self {
+        Self {
+            clients,
+            repositories,
+        }
+    }
+}
 
 #[derive(Getters)]
 pub struct Repositories<'a> {
@@ -13,6 +30,19 @@ impl<'a> Repositories<'a> {
     pub fn new(db: &'a DatabaseConnection) -> Self {
         Self {
             tag_repository: TagRepository::new(db),
+        }
+    }
+}
+
+#[derive(Getters)]
+pub struct Clients<'a> {
+    rule_client: RuleClient<'a>,
+}
+
+impl<'a> Clients<'a> {
+    pub fn new(twitter: &'a TwitterApi<BearerToken>) -> Self {
+        Self {
+            rule_client: RuleClient::new(twitter),
         }
     }
 }
@@ -43,6 +73,12 @@ impl From<DbErr> for DomainError {
 
 impl From<twitter_v2::Error> for DomainError {
     fn from(error: twitter_v2::Error) -> Self {
+        DomainError::InfrastructureError(error.into())
+    }
+}
+
+impl From<OptionalError> for DomainError {
+    fn from(error: OptionalError) -> Self {
         DomainError::InfrastructureError(error.into())
     }
 }
