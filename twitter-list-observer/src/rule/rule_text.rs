@@ -5,7 +5,7 @@ use crate::{
 };
 use derive_getters::Getters;
 use rust_lib::portal::SourcePlatform;
-use std::collections::HashSet;
+use std::{collections::HashSet, fmt::Display};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Getters)]
 pub struct RuleText {
@@ -14,6 +14,12 @@ pub struct RuleText {
 
 pub trait RuleTextFactoryTrait {
     fn create(parts: Option<HashSet<RulePart>>, users: Option<HashSet<User>>) -> Result<RuleText>;
+}
+
+impl Display for RuleText {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.value())
+    }
 }
 
 impl RuleText {

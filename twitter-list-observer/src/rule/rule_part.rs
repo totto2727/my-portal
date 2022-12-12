@@ -1,3 +1,4 @@
+use std::fmt::Display;
 use derive_getters::Getters;
 use rust_lib::database::entity::rule;
 

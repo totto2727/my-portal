@@ -143,7 +143,7 @@ mod tests {
         let rules: HashSet<RulePart> = HashSet::from_iter(rules);
         let users = vec![User::new("1", None, "")];
         let users: HashSet<User> = HashSet::from_iter(users);
-        let created = TwitterRuleTextFactory::create(rules, users);
+        let created = TwitterRuleTextFactory::create(rules.into(), users.into());
         assert!(created.is_ok());
         assert_eq!(
             created.unwrap(),
